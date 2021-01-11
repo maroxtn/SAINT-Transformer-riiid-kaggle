@@ -1,6 +1,6 @@
 full_data: False
 seq_len: 100
-batch_size: 64
+batch_size: 256
 
 #Transformer hyperparameters
 d_model: 64

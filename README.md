@@ -1,14 +1,20 @@
 # SAINT Transformer model
 
-This is my solution for the Riiid knowledge tracing competition, which was ensembled with an LGBM model to give me the 39th rank.
+This is my solution for the Riiid knowledge tracing competition, which was ensembled with an LGBM model to give me the 39th rank. 
 
-For the code to be run properly, the dataset should be in `/data/raw` then:
+To run the code you should: 
 
-- `src/data/validation_split.py` should be ran so we have both validation and training data
-- `src/data/preprocess.py` will create the training and validation data preprocessed, and will create a file with user's history, all pickled to data/preprocessed
-- `src/models/train.py` will train the model, and save it in `models/`
+- Download the dataset using either the kaggle api or manually to `data/raw/` , questions.csv and train.csv only are going to be used.
+- Configure the model hyper-parameter, and general config in `config.yaml`
+- Run: `python src/data/validation_split.py` to create the validation data
+- Run: `python src/data/preprocess.py` to preprocess the data, and make training and validation into the right format
+- Run: `src/modelds/train.py` to train the model.
 
-**Note** that running all the transformations on the raw data would require at least 32GB of ram, training will take 15 minutes per epoch for the entire data. 
+Feel free to check the source, I tried to make it as readable as possible. After finishing the training, you can play with the inference code, with the kaggle time series API emulator in notebooks directory.
+
+-----
+
+**Note** that running all the transformations on the raw data would require at least 32GB of ram, training will take 15 minutes per epoch for the entire data. If all data is used, training would use 70M + sequences.
 
 -----
 

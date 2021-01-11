@@ -49,14 +49,10 @@ validation = pd.read_pickle("data/interim/cv_valid.pickle")
 #Remove uneeded rows, and drop lectures for the training data
 del train_data["prior_question_had_explanation"]
 del train_data["prior_question_elapsed_time"]
-del train_data["max_time_stamp"]
-del train_data["rand_time_stamp"]
 del train_data["viretual_time_stamp"]
 
 del validation["prior_question_had_explanation"]
 del validation["prior_question_elapsed_time"]
-del validation["max_time_stamp"]
-del validation["rand_time_stamp"]
 del validation["viretual_time_stamp"]
 
 train_data = train_data[train_data.content_type_id == False]
