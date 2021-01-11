@@ -5,13 +5,14 @@ import pandas as pd
 import random
 import gc
 
+import yaml
+
 random.seed(1)
 
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=yaml.FullLoader)
 
-data_dir = "../../data/"
-
-
-train = pd.read_csv('/kaggle/input/riiid-test-answer-prediction/train.csv',
+train = pd.read_csv('data/raw/train.csv',
                    dtype={'row_id': 'int64',
                           'timestamp': 'int64',
                           'user_id': 'int32',
@@ -24,7 +25,7 @@ train = pd.read_csv('/kaggle/input/riiid-test-answer-prediction/train.csv',
                           'prior_question_had_explanation': 'boolean'}
                    )
 
-
+    
 max_timestamp_u = train[['user_id','timestamp']].groupby(['user_id']).agg(['max']).reset_index()
 max_timestamp_u.columns = ['user_id', 'max_time_stamp']
 MAX_TIME_STAMP = max_timestamp_u.max_time_stamp.max()
@@ -49,12 +50,10 @@ gc.collect()
 
 train = train.sort_values(['viretual_time_stamp', 'row_id']).reset_index(drop=True)
 
-
-
-val_size = 2500000
+val_size = int(train.shape[0] * 0.025)  #Would be roughly 2.5M for full data
 
 valid = train[-val_size:]
 train = train[:-val_size]
 
-valid.to_pickle(f'{data_dir}interim/cv_valid.pickle')
-train.to_pickle(f'{data_dir}interim/cv_train.pickle')
+valid.to_pickle(f'data/interim/cv_valid.pickle')
+train.to_pickle(f'data/interim/cv_train.pickle')

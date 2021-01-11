@@ -1,0 +1,15 @@
+full_data: False
+seq_len: 100
+batch_size: 64
+
+#Transformer hyperparameters
+d_model: 64
+decoder_layers: 2
+encoder_layers: 2
+dropout: 0.1
+
+
+correct_start_token: 2
+user_answer_start_token: 4
+
+n_epochs: 60

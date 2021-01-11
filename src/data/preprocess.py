@@ -9,7 +9,6 @@ import glob
 import time
 from os import listdir
 from typing import Dict
-import datatable as dt
 
 import sklearn.preprocessing as preprocessing
 from sklearn.metrics import roc_auc_score
@@ -17,6 +16,7 @@ from sklearn.metrics import roc_auc_score
 import pandas as pd
 
 from sys import getsizeof
+import pickle
 
 #supress warnings
 import warnings
@@ -25,21 +25,25 @@ warnings.filterwarnings("ignore")
 import time
 import gc
 import math 
+from tqdm import tqdm
+import yaml
+
+
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=yaml.FullLoader)
 
 
 
-data_dir = "../../data/"
 
-
-seq_len = 100
+seq_len = config["seq_len"]
 
 #If True, the model would be trained on +70 Million rows, 20M otherwise
 train_full = False
 
 
 #Load the validation / training splitted data created by Tito. The validation data occur after the training data.
-train_data = pd.read_pickle(dir_data + "interim/cv_train.pickle")
-validation = pd.read_pickle(dir_data + "interim/cv_valid.pickle")
+train_data = pd.read_pickle("data/interim/cv_train.pickle")
+validation = pd.read_pickle("data/interim/cv_valid.pickle")
 
 
 #Remove uneeded rows, and drop lectures for the training data
@@ -117,20 +121,12 @@ group = group.drop(index=val_group.index)
 
 #Creating sequences of 100 of the all interactions less than 1000
 user_counts = group.apply(lambda x: len(x[0])).sort_values(ascending=False)
-
-if train_full:  #Train with subset of data or not
-    user_counts = user_counts[(user_counts >= seq_len)]
-else:
-    user_counts = user_counts[((user_counts >= seq_len) & (user_counts <= 1000))]
+user_counts = user_counts[(user_counts >= seq_len)]
 
 accepted_ids = user_counts.index
 group = group.loc[accepted_ids]
 
 group.index = group.index.astype("str")
-
-
-
-from tqdm import tqdm
 
 auxiliary = []
 k = 0
@@ -153,9 +149,11 @@ for line in tqdm(group):
     auxiliary.extend(lst) 
 
 
+auxiliary = pd.Series(auxiliary)
+
 #Training and validation data
-auxiliary.to_pickle(data_dir + "processed/training.pickle")
-val_group.to_pickle(data_dir + "processed/validation.pickle")
+auxiliary.to_pickle("data/processed/training.pickle")
+val_group.to_pickle("data/processed/validation.pickle")
 
 
 
@@ -164,7 +162,7 @@ group = train_data[['user_id', 'content_id', 'answered_correctly', 'timestamp',"
             r['content_id'].values,
             r['answered_correctly'].values, r['timestamp'].values,r['user_answer'].values))
 
-group.to_pickle(data_dir + "processed/inference_group")
+group.to_pickle("data/processed/inference_group")
 
-with open(data_dir + 'inference_last_timestamp.pickle', 'wb') as handle:
+with open('data/processed/inference_last_timestamp.pickle', 'wb') as handle:
     pickle.dump(last_timestamp, handle, protocol=pickle.HIGHEST_PROTOCOL)
